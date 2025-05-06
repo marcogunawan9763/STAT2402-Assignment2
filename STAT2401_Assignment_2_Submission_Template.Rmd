@@ -1,0 +1,51 @@
+---
+title: "Assignment 2 Submission"
+author: "Your name(s)"
+date: "submission date"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Statement of Contribution
+
+Include this if pairing.
+
+State what each team member has contributed to the assignment before answering the questions. Each student must contribute towards ALL questions. Your assignment will not be marked without this statement.
+
+```{r eval=FALSE, include=FALSE}
+## There are a few options in every chunk, click the setting button (greyed) near the triangle:
+# 1. to use default as in the above (show code and output, ie ECHO=TRUE) or 
+# 2. to show output only (ie ECHO=FALSE) or
+# 3. show nothing (run code) ie include=FALSE
+# 4. show nothing (dont run the code), like this chunk, ie eval=FALSE, include=FALSE
+## You can knit this template into Word and then update it into pdf etc..
+## You can create your own way for submission, this is just an example if you are going to use Rmd.
+```
+
+# Question 1: Air Pollution and Mortality. Does pollution kill people? (30 marks)
+
+(a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
+
+    **Answer:**
+
+    *Answer text here*
+
+    ```{r}
+    # Answer code here
+    ```
+
+**Continue with other questions here.**
+
+# Question 2: Body Measurements (25 marks)
+
+(a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling.
+
+    **Answer:**
+
+    *Answer text here*
+
+**Continue with other questions here.**

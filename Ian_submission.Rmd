@@ -26,9 +26,7 @@ State what each team member has contributed to the assignment before answering t
 ## You can create your own way for submission, this is just an example if you are going to use Rmd.
 ```
 
-
 # Question 1: Air Pollution and Mortality. Does pollution kill people? (30 marks)
-
 
 (a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
 
@@ -41,14 +39,88 @@ State what each team member has contributed to the assignment before answering t
 
     ```
 
-**Continue with other questions here.**
-
-# Question 2: Body Measurements (25 marks)
-
-(a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling. 
+(b) (9 marks) Perform model selection process using the all subset method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to differences in climate and socioeconomic factors. Identify optimal model(s) based on each of the adjusted R2 , BIC and $C_p$. Use a maximum of 10 variables for the selection. For each criterion, state the number and names of the selected variables.
 
     **Answer:**
 
     *Answer text here*
 
-**Continue with other questions here.**
+    ```{r}
+    # Answer code here
+    ```
+
+(c) (4 marks) Fit the model with the lowest $C_p$ as obtained in (b). Write the equation of this fitted model. Interpret this model.
+
+    **Answer:**
+
+    *Answer text here*
+
+    ```{r}
+    # Answer code here
+    ```
+
+(d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
+
+    **Answer:**
+
+    *Answer text here*
+
+    ```{r}
+    # Answer code here
+    ```
+
+(e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
+
+    **Answer:**
+
+    *Answer text here*
+
+    ```{r}
+    # Answer code here
+    ```
+
+# Question 2: Body Measurements (25 marks)
+
+(a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling.
+
+    **Answer:**
+
+    *Answer text here*
+
+(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80% of the data and the testing set contains 20%. Construct two multiple linear regression 3 models for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Write the two fitted model equations and compare them in a few concise sentences.
+
+    **Answer:**
+
+    *Answer text here*
+
+    ```{r}
+    # Answer code here
+    ```
+
+(c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
+
+    **Answer:**
+
+    *Answer text here*
+
+    ```{r}
+    # Answer code here
+    ```
+
+(d) (6 marks). Despite any inadequacies that you may or may not have identified above, you use the two models obtained in (b) to make predictions of Weight in the test set.
+
+(e) Produce a correctly drawn and labelled plot of predicted values against the actual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model.
+
+<!-- -->
+
+(ii) Using the RMSEPs and the plots you produced, comment on how well the models performed.
+
+````         
+**Answer:**
+
+*Answer text here*
+
+```{r}
+# Answer code here
+```
+````

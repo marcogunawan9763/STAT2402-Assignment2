@@ -104,11 +104,17 @@ summary(cp_model)
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
 
     **Answer:**
+Yes there are influential points in the data, those being 7,20,60 and 
 
     *Answer text here*
 
     ```{r}
     # Answer code here
+plot(cp_model, which = 5, cook.levels = 4 / (nrow(data_thingy) - 2))
+
+cooks_d <- cooks.distance(cp_model)
+sort(cooks_d, decreasing = TRUE)[1:5]
+
     ```
 
 (e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
@@ -119,6 +125,15 @@ summary(cp_model)
 
     ```{r}
     # Answer code here
+    cp_model_expanded <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite + log(HC) + log(NOX) +log(SO2), data = data_thingy)
+    
+    cp_model <- lm(Mortality ~ Precip + Humidity + JanTemp + JulyTemp + 
+                          Over65 + House + Educ + Sound + Density +
+                          NonWhite + WhiteCol + Poor, data = data_thingy)
+    
+    
+    anova(cp_model, cp_model_expanded)
+    
     ```
 
 # Question 2: Body Measurements (25 marks)

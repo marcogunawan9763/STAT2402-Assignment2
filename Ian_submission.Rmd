@@ -45,6 +45,23 @@ pairs(climate_variables, main = "Climate Variables vs Mortality")
 
 
 
+pollution <- read.csv("Pollution.csv")
+    
+#Climate EDA plot
+climate_variables <- pollution[, c("Mortality", "Precip", "Humidity", "JanTemp", "JulyTemp")]
+pairs(climate_variables, main = "Climate Variables vs Mortality")
+  
+#Socioeconomic EDA plot
+socioeconomic_variables <- pollution[, c("Mortality", "Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")]
+pairs(socioeconomic_variables, main = "Socioeconomic Variables vs Mortality")
+
+#Pollution EDA plot
+pollution_variables <- pollution[, c("Mortality", "HC", "NOX", "SO2")]
+pairs(pollution_variables, main = "Pollution Variables vs Mortality")
+
+
+#
+
 
     ```
 

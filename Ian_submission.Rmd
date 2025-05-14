@@ -53,6 +53,19 @@ pairs(pollution_variables, main = "Pollution Variables vs Mortality")
 #Combining the comparisons of the response against State.Code and Region respectively
 #what do i do here?
 
+par(mfrow = c(1, 2))  # 1 row, 2 plots
+
+# Mortality vs State.Code
+boxplot(Mortality ~ State.code, data = pollution,
+        main = "Mortality by State Code",
+        xlab = "State Code", ylab = "Mortality",
+        las = 2, col = "lightblue")
+
+# Mortality vs Region
+boxplot(Mortality ~ Region, data = pollution,
+        main = "Mortality by Region",
+        xlab = "Region", ylab = "Mortality",
+        col = "lightgreen")
 
     ```
 

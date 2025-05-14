@@ -31,10 +31,19 @@ State what each team member has contributed to the assignment before answering t
 (a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
 
     **Answer:**
+    
+    I uhhh did this on my home pc will update once back
 
     *Answer text here*
 
     ```{r}
+pollution <- read.csv("Pollution.csv")
+
+#Climate EDA Plot
+climate_variables <- pollution[, c("Mortality", "Precip", "Humidity", "JanTemp", "JulyTemp")]
+pairs(climate_variables, main = "Climate Variables vs Mortality")
+
+
 
 pollution <- read.csv("Pollution.csv")
     
@@ -63,17 +72,50 @@ pairs(pollution_variables, main = "Pollution Variables vs Mortality")
     *Answer text here*
 
     ```{r}
-    # Answer code here
+library(leaps)
+source("all-subsets-lm.R")
+  
+data_thingy <- read.csv("Pollution.csv")
+
+model <- lm(Mortality ~ Precip + Humidity + JanTemp + JulyTemp + 
+                          Over65 + House + Educ + Sound + Density +
+                          NonWhite + WhiteCol + Poor,
+            data = data_thingy)
+
+allsubsets_adjR2 <- all_subsets_lm(model, criterion = "adjR2")
+allsubsets_bic   <- all_subsets_lm(model, criterion = "BIC")
+allsubsets_c_p   <- all_subsets_lm(model, criterion = "Cp")
+
+allsubsets_adjR2$variables
+allsubsets_bic$variables
+allsubsets_c_p$variables
     ```
+    
 
 (c) (4 marks) Fit the model with the lowest $C_p$ as obtained in (b). Write the equation of this fitted model. Interpret this model.
 
     **Answer:**
 
+Equation: Mortality = 1242.0+  1.401 * Precip -1.684 * JanTemp - 2.8 * JulyTemp -16.16 * Educ + 0.00757 * Density + 5.275 * Nonwhite
+
+Interpretation: Will write later aaaaaaaaaaaa
+
+Things to mention: 
+
+  Model Performance
+    - R^2 / Variation
+    - F-test (p value)
+  Coefficient Interpretations 
+    - legit just say what each thing does to the mortality
+    
     *Answer text here*
 
     ```{r}
-    # Answer code here
+cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = data_thingy)
+    
+summary(cp_model)
+
+
     ```
 
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.

@@ -51,7 +51,6 @@ pairs(pollution_variables, main = "Pollution Variables vs Mortality")
 
 
 #Combining the comparisons of the response against State.Code and Region respectively
-#what do i do here?
 
 par(mfrow = c(1, 2))  # 1 row, 2 plots
 

@@ -31,8 +31,6 @@ State what each team member has contributed to the assignment before answering t
 (a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
 
     **Answer:**
-    
-    I uhhh did this on my home pc will update once back
 
     *Answer text here*
 
@@ -52,7 +50,8 @@ pollution_variables <- pollution[, c("Mortality", "HC", "NOX", "SO2")]
 pairs(pollution_variables, main = "Pollution Variables vs Mortality")
 
 
-#
+#Combining the comparisons of the response against State.Code and Region respectively
+#what do i do here????
 
 
     ```
@@ -74,9 +73,9 @@ model <- lm(Mortality ~ Precip + Humidity + JanTemp + JulyTemp +
                           NonWhite + WhiteCol + Poor,
             data = data_thingy)
 
-allsubsets_adjR2 <- all_subsets_lm(model, criterion = "adjR2")
-allsubsets_bic   <- all_subsets_lm(model, criterion = "BIC")
-allsubsets_c_p   <- all_subsets_lm(model, criterion = "Cp")
+allsubsets_adjR2 <- all_subsets_lm(model, criterion = "adjR2",p_max = 10)
+allsubsets_bic   <- all_subsets_lm(model, criterion = "BIC",p_max = 10)
+allsubsets_c_p   <- all_subsets_lm(model, criterion = "Cp", p_max = 10)
 
 allsubsets_adjR2$variables
 allsubsets_bic$variables

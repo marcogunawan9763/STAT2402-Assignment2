@@ -66,12 +66,13 @@ pairs(pollution_variables, main = "Pollution Variables vs Mortality")
 library(leaps)
 source("all-subsets-lm.R")
   
-data_thingy <- read.csv("Pollution.csv")
+poll_data <- read.csv("Pollution.csv")
 
+#Using the subset of variables
 model <- lm(Mortality ~ Precip + Humidity + JanTemp + JulyTemp + 
                           Over65 + House + Educ + Sound + Density +
                           NonWhite + WhiteCol + Poor,
-            data = data_thingy)
+            data = poll_data)
 
 allsubsets_adjR2 <- all_subsets_lm(model, criterion = "adjR2",p_max = 10)
 allsubsets_bic   <- all_subsets_lm(model, criterion = "BIC",p_max = 10)
@@ -102,7 +103,8 @@ Things to mention:
     *Answer text here*
 
     ```{r}
-cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = data_thingy)
+poll_data <- read.csv("Pollution.csv")
+    cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
     
 summary(cp_model)
 
@@ -112,35 +114,38 @@ summary(cp_model)
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
 
     **Answer:**
-Yes there are influential points in the data, those being 7,20,60 and 
+Yes there are influential points in the data, those being 7,20,60 and (find the ones not shown :P )
 
     *Answer text here*
 
     ```{r}
     # Answer code here
-plot(cp_model, which = 5, cook.levels = 4 / (nrow(data_thingy) - 2))
+poll_data <- read.csv("Pollution.csv")
+cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
+    
+plot(cp_model, which = 5, cook.levels = 4 / (nrow(poll_data) - 2))
 
-cooks_d <- cooks.distance(cp_model)
-sort(cooks_d, decreasing = TRUE)[1:5]
+cooks_distance <- cooks.distance(cp_model)
+sort(cooks_distance, decreasing = TRUE)[1:5]
 
     ```
 
 (e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
 
     **Answer:**
+Expand on later but Small p value means reject null hypotosies blah blah blah
 
     *Answer text here*
 
     ```{r}
     # Answer code here
-    cp_model_expanded <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite + log(HC) + log(NOX) +log(SO2), data = data_thingy)
+poll_data <- read.csv("Pollution.csv")
+
+cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
+
+cp_model_expanded <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite + log(HC) + log(NOX) +log(SO2), data = poll_data)
     
-    cp_model <- lm(Mortality ~ Precip + Humidity + JanTemp + JulyTemp + 
-                          Over65 + House + Educ + Sound + Density +
-                          NonWhite + WhiteCol + Poor, data = data_thingy)
-    
-    
-    anova(cp_model, cp_model_expanded)
+anova(cp_model, cp_model_expanded)
     
     ```
 

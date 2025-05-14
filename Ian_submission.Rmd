@@ -38,14 +38,6 @@ State what each team member has contributed to the assignment before answering t
 
     ```{r}
 pollution <- read.csv("Pollution.csv")
-
-#Climate EDA Plot
-climate_variables <- pollution[, c("Mortality", "Precip", "Humidity", "JanTemp", "JulyTemp")]
-pairs(climate_variables, main = "Climate Variables vs Mortality")
-
-
-
-pollution <- read.csv("Pollution.csv")
     
 #Climate EDA plot
 climate_variables <- pollution[, c("Mortality", "Precip", "Humidity", "JanTemp", "JulyTemp")]

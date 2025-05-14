@@ -147,8 +147,46 @@ grid.arrange(grobs = plots, ncol = 2)
     *Answer text here*
 
     ```{r}
-    # Answer code here
+    # Data Selection
+    set.seed(2401)
+    train_index <- sample(nrow(body_clean), floor(0.8 * nrow(body_clean)))
+    BodyMeasurementsTrain <- body_clean[train_index, ]
+    BodyMeasurementsTest <- body_clean[-train_index, ]
+    
+    #Multiple Linear Regression Model
+    set.seed(2401) #set seed for reproducibility
+    body_lm <- lm(Weight ~ ., data = body_clean)
+    body_lm_intercept_only <- lm(Weight ~ 1, data = body_clean)
+    
+    #Forward Selection
+    body_forward <- step(
+      body_lm_intercept_only, 
+      scope = ~ (
+        Biacromial.diameter + Biiliac.diameter + Bitrochanteric.diameter +
+        Chest.depth + Chest.diameter + Elbow.diameter + Wrist.diameter +
+        Knee.diameter + Ankle.diameter + Shoulder.girth + Chest.girth +
+        Waist.girth + Navel.girth + Hip.girth + Thigh.girth + Bicep.girth +
+        Forearm.girth + Knee.girth + Calf.maximum.girth + Ankle.minimum.girth +
+        Wrist.minimum.girth + Age + Height + Gender
+      ),
+      direction = 'forward',
+      trace = 0)
+
+    
+    #Backwards Selection
+    body_backward <- step(
+      body_lm,
+      direction = 'backward',
+      trace = 0
+    )
     ```
+
+
+```{r}
+summary(body_forward)
+
+summary(body_backward)
+```
 
 (c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
 

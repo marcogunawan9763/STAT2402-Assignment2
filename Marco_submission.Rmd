@@ -83,10 +83,64 @@ State what each team member has contributed to the assignment before answering t
 (a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling.
 
     **Answer:**
+    
+    First, we have a peek at the variables of the dataset using the names() function.
+    ```{r echo=FALSE}
+    body <- read.csv("body.csv")
+    names(body)
+    
+    ```
+    
+    Using str() and with the information provided with the task, we know that the dataset is mostly numeric, with 26 variables. With two variables standing out, primarily, X (the row index) and gender (a factor with two levels). I cleaned the data by removing X and performing EDA from then on.
+    
+    As there are 26 variables, and producing a pairs plot would result in 625 scatterplots, resulting in a plot which is too dense to view meaningfully, we have opted for a heatmap analysis instead.
+    ```{r echo=FALSE}
+    body_clean <- body[,c(-1)]
+    
+    library(corrplot)
+    
+    # Calculate correlation matrix
+    cor_matrix <- cor(body_clean, use = "complete.obs")
+    
+    # Create correlation heatmap
+    corrplot(cor_matrix, method = "color", type = "upper", 
+             order = "hclust", tl.col = "black", tl.cex = 0.7) 
+    ```
+    Strong positive correlations appear as dark blue squares, showing many body measurements are highly correlated with each other. Having a look at the heatmap itself, we can see that particularly weight, waist girth, chest girth and various other girth measurements appears to be strongly correlated. Furthermore, Gender shows moderate to strong correlations with many variables (visible in the bottom row), suggesting body measurements differ significantly between genders. Whilst Age seems to have little to no correlation to any other variables.
+    
+    As gender is a categorical variable, I decided to create boxplots for further analysis with the numeric variables that are most strongly correlated to gender.
+    
+```{r}
+# For multiple variables in a grid
+library(ggplot2)
+library(gridExtra)
+library(purrr)
 
-    *Answer text here*
+gender_body <- body_clean
+gender_body$Gender <- factor(gender_body$Gender, labels = c("Female", "Male"))
 
-(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80% of the data and the testing set contains 20%. Construct two multiple linear regression 3 models for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Write the two fitted model equations and compare them in a few concise sentences.
+# Function to create individual boxplots
+create_boxplot <- function(var_name) {
+  ggplot(gender_body, aes_string(x = "factor(Gender)", y = var_name, fill = "factor(Gender)")) +
+    geom_boxplot() +
+    labs(title = paste(var_name, "by Gender"), x = "Gender", y = var_name) +
+    theme_minimal() +
+    theme(legend.position = "none")
+}
+
+# Select variables with strongest gender correlation
+gender_related_vars <- c("Weight", "Height", "Waist.girth", "Elbow.diameter")
+
+# Create plots
+plots <- map(gender_related_vars, create_boxplot)
+
+# Arrange in a grid
+grid.arrange(grobs = plots, ncol = 2)
+```
+
+    For the main response variable, weight, we can see that male has a notably higher median weight (~78kg) to female's median at (~60kg). Both groups show some outliers at the upper end, particularly among females. These measurements show clear sexual dimorphism in human body proportions, with minimal overlap in distributions for measurements like height and waist girth. 
+
+(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80% of the data and the testing set contains 20%. Construct a multiple linear regression model for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Write the two fitted model equations and compare them in a few concise sentences.
 
     **Answer:**
 

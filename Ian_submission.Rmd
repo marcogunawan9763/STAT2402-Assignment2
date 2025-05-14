@@ -31,20 +31,40 @@ State what each team member has contributed to the assignment before answering t
 (a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
 
     **Answer:**
-    
-    I uhhh did this on my home pc will update once back
 
     *Answer text here*
 
     ```{r}
 pollution <- read.csv("Pollution.csv")
-
-#Climate EDA Plot
+    
+#Climate EDA plot
 climate_variables <- pollution[, c("Mortality", "Precip", "Humidity", "JanTemp", "JulyTemp")]
 pairs(climate_variables, main = "Climate Variables vs Mortality")
+  
+#Socioeconomic EDA plot
+socioeconomic_variables <- pollution[, c("Mortality", "Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")]
+pairs(socioeconomic_variables, main = "Socioeconomic Variables vs Mortality")
+
+#Pollution EDA plot
+pollution_variables <- pollution[, c("Mortality", "HC", "NOX", "SO2")]
+pairs(pollution_variables, main = "Pollution Variables vs Mortality")
 
 
+#Combining the comparisons of the response against State.Code and Region respectively
 
+par(mfrow = c(1, 2))  # 1 row, 2 plots
+
+# Mortality vs State.Code
+boxplot(Mortality ~ State.code, data = pollution,
+        main = "Mortality by State Code",
+        xlab = "State Code", ylab = "Mortality",
+        las = 2, col = "lightblue")
+
+# Mortality vs Region
+boxplot(Mortality ~ Region, data = pollution,
+        main = "Mortality by Region",
+        xlab = "Region", ylab = "Mortality",
+        col = "lightgreen")
 
     ```
 
@@ -58,16 +78,17 @@ pairs(climate_variables, main = "Climate Variables vs Mortality")
 library(leaps)
 source("all-subsets-lm.R")
   
-data_thingy <- read.csv("Pollution.csv")
+poll_data <- read.csv("Pollution.csv")
 
+#Using the subset of variables
 model <- lm(Mortality ~ Precip + Humidity + JanTemp + JulyTemp + 
                           Over65 + House + Educ + Sound + Density +
                           NonWhite + WhiteCol + Poor,
-            data = data_thingy)
+            data = poll_data)
 
-allsubsets_adjR2 <- all_subsets_lm(model, criterion = "adjR2")
-allsubsets_bic   <- all_subsets_lm(model, criterion = "BIC")
-allsubsets_c_p   <- all_subsets_lm(model, criterion = "Cp")
+allsubsets_adjR2 <- all_subsets_lm(model, criterion = "adjR2",p_max = 10)
+allsubsets_bic   <- all_subsets_lm(model, criterion = "BIC",p_max = 10)
+allsubsets_c_p   <- all_subsets_lm(model, criterion = "Cp", p_max = 10)
 
 allsubsets_adjR2$variables
 allsubsets_bic$variables
@@ -94,7 +115,8 @@ Things to mention:
     *Answer text here*
 
     ```{r}
-cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = data_thingy)
+poll_data <- read.csv("Pollution.csv")
+    cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
     
 summary(cp_model)
 
@@ -104,21 +126,39 @@ summary(cp_model)
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
 
     **Answer:**
+Yes there are influential points in the data, those being 7,20,60 and (find the ones not shown :P )
 
     *Answer text here*
 
     ```{r}
     # Answer code here
+poll_data <- read.csv("Pollution.csv")
+cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
+    
+plot(cp_model, which = 5, cook.levels = 4 / (nrow(poll_data) - 2))
+
+cooks_distance <- cooks.distance(cp_model)
+sort(cooks_distance, decreasing = TRUE)[1:5]
+
     ```
 
 (e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
 
     **Answer:**
+Expand on later but Small p value means reject null hypotosies blah blah blah
 
     *Answer text here*
 
     ```{r}
     # Answer code here
+poll_data <- read.csv("Pollution.csv")
+
+cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
+
+cp_model_expanded <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite + log(HC) + log(NOX) +log(SO2), data = poll_data)
+    
+anova(cp_model, cp_model_expanded)
+    
     ```
 
 # Question 2: Body Measurements (25 marks)

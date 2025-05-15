@@ -68,46 +68,20 @@ pairs(pollution_variables, main = "Pollution Variables vs Mortality")
 
 par(mfrow = c(1, 2))  # 1 row, 2 plots
 
-# Mortality vs State.Code
-boxplot(Mortality ~ State.code, data = pollution,
+
+# Plot 1: Mortality vs filtered State.code
+table(pollution$State.code)
+filtered_pollution <- subset(pollution, State.code %in% c("CA", "CT", "MA", "MI", "MO", "NY", "OH", "PA", "TN", "TX"))
+boxplot(Mortality ~ State.code, data = filtered_pollution,
         main = "Mortality by State Code",
         xlab = "State Code", ylab = "Mortality",
         las = 2, col = "lightblue")
 
-# Mortality vs Region
+# Plot 2: Mortality vs Region (unfiltered)
 boxplot(Mortality ~ Region, data = pollution,
         main = "Mortality by Region",
-<<<<<<< HEAD
-        xlab = "Region", ylab = "Mortality",las = 2,
-        col = "lightgreen")
-table(pollution$State.code)
-=======
         xlab = "Region", ylab = "Mortality",
-        las = 2 , col = "lightgreen")
-
-
-
-
-
-
-library(ggplot2)
-library(gridExtra)  # For arranging multiple ggplot plots
-
-# List of socioeconomic variables
-socio_vars <- c("Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")
-
-# Create a list of ggplot scatterplots
-plots <- lapply(socio_vars, function(var) {
-  ggplot(pollution, aes_string(x = var, y = "Mortality")) +
-    geom_point(color = "steelblue", alpha = 0.7) +
-    labs(title = paste("Mortality vs", var), x = var, y = "Mortality") +
-    theme_minimal(base_size = 11)
-})
-
-# Arrange the plots (e.g., 2 rows of 4 plots)
-grid.arrange(grobs = plots, nrow = 2)
->>>>>>> 1ece868c7b11fe3eacf734e1664e97c8baf6892c
-
+        las = 2, col = "lightgreen")
 
     ```
 

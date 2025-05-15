@@ -31,6 +31,20 @@ State what each team member has contributed to the assignment before answering t
 (a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
 
     **Answer:**
+    
+    Climate EDA: The Mortality-Precip plot shows a strong postive linear relationship, indicating that as the precipitation increases, so does the Mortality. The Mortality-Humidity plot shows no clear relationship. The Mortality-JanTemp plot depeicts either no clear relationship or a very weak negative relationship. Lastly the Mortality-JulyTemp plot depicts a moderate positive relationship with a few outliers. 
+    
+    Socioeconomic Variables EDA: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    
+    Pollution Variables EDA: The Mortality-HC plot shows no correlation between the two variables, same with the Mortality-NOX plot. However the Mortality SO2 plot depoicts a Moderate positive relationship. This means as the SO2 increases so does mortality.
+    
+    Mortality by Region Analysis: The south region has the highest rates of mortality, the highest median (975) as well as the widest range. The median and range are notably higher than then rest of the regions. The West region has the lowest average mortality rate (875) as well as the most narrow spread. The Midwest and Northeast are similar in average values (~940) and an outlier in the Midwest data. The regional differences stated suggests that the region a personn lives in may influence their mortality rate.
+    
+    
+    Mortality by State Code Analysis: 
+
+
+
 
     *Answer text here*
 
@@ -63,9 +77,36 @@ boxplot(Mortality ~ State.code, data = pollution,
 # Mortality vs Region
 boxplot(Mortality ~ Region, data = pollution,
         main = "Mortality by Region",
+<<<<<<< HEAD
         xlab = "Region", ylab = "Mortality",las = 2,
         col = "lightgreen")
 table(pollution$State.code)
+=======
+        xlab = "Region", ylab = "Mortality",
+        las = 2 , col = "lightgreen")
+
+
+
+
+
+
+library(ggplot2)
+library(gridExtra)  # For arranging multiple ggplot plots
+
+# List of socioeconomic variables
+socio_vars <- c("Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")
+
+# Create a list of ggplot scatterplots
+plots <- lapply(socio_vars, function(var) {
+  ggplot(pollution, aes_string(x = var, y = "Mortality")) +
+    geom_point(color = "steelblue", alpha = 0.7) +
+    labs(title = paste("Mortality vs", var), x = var, y = "Mortality") +
+    theme_minimal(base_size = 11)
+})
+
+# Arrange the plots (e.g., 2 rows of 4 plots)
+grid.arrange(grobs = plots, nrow = 2)
+>>>>>>> 1ece868c7b11fe3eacf734e1664e97c8baf6892c
 
 
     ```

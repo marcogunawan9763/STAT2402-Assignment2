@@ -63,8 +63,10 @@ boxplot(Mortality ~ State.code, data = pollution,
 # Mortality vs Region
 boxplot(Mortality ~ Region, data = pollution,
         main = "Mortality by Region",
-        xlab = "Region", ylab = "Mortality",
+        xlab = "Region", ylab = "Mortality",las = 2,
         col = "lightgreen")
+table(pollution$State.code)
+
 
     ```
 

@@ -144,19 +144,22 @@ grid.arrange(grobs = plots, ncol = 2)
 
     **Answer:**
 
-    *Answer text here*
+    We begin by splitting the dataset into a training set and a testing set. Using both forward and backwards selection, we yield the following model equations.
 
     ```{r}
     # Data Selection
     set.seed(2401)
-    train_index <- sample(nrow(body_clean), floor(0.8 * nrow(body_clean)))
-    BodyMeasurementsTrain <- body_clean[train_index, ]
-    BodyMeasurementsTest <- body_clean[-train_index, ]
+    test_index <- sample(nrow(body_clean), floor(0.2 * nrow(body_clean)))
+    BodyMeasurementsTrain <- body_clean[-test_index, ]
+    BodyMeasurementsTest <- body_clean[test_index, ]
     
+    ```
+    
+    ```{r echo = FALSE}
     #Multiple Linear Regression Model
     set.seed(2401) #set seed for reproducibility
-    body_lm <- lm(Weight ~ ., data = body_clean)
-    body_lm_intercept_only <- lm(Weight ~ 1, data = body_clean)
+    body_lm <- lm(Weight ~ ., data = BodyMeasurementsTrain)
+    body_lm_intercept_only <- lm(Weight ~ 1, data = BodyMeasurementsTrain)
     
     #Forward Selection
     body_forward <- step(
@@ -181,12 +184,59 @@ grid.arrange(grobs = plots, ncol = 2)
     )
     ```
 
+    The first model given by the forward AIC step function is shown below:
+    ```{r echo=FALSE}
+    #further work on the forward selection model
+    summary(body_forward)
+    ```
+    We notice that there are some variables tha tare a apart of this model that are not statistically significant, that is, their p-value is greater than 0.05. Taking away these variables with the largest p-value first, we repeat the process until all statistically insignificant variables have been removed or until the overall model fit (adjusted R-squared, AIC, BIC) significantly worsen.
+    
+    After these steps, the final model is given as below:
+    
+    ```{r include=FALSE}
+    #first removed <- elbow diameter
+    body_forward_1 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+    Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+    Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+    Chest.diameter + Bicep.girth + Wrist.minimum.girth + 
+    Wrist.diameter, 
+    
+    data = BodyMeasurementsTrain)
+    
+    summary(body_forward_1)
+    ```
+    
+    ```{r include=FALSE}
+    body_forward_2 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+                        Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+                          Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+                          Bicep.girth + Wrist.minimum.girth + 
+                          Wrist.diameter, 
+                        data = BodyMeasurementsTrain)
+    
+    summary(body_forward_2)
+    ```
 
-```{r}
-summary(body_forward)
+    ```{r include=FALSE}
+    body_forward_3 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+                        Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+                          Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+                          Chest.diameter + Wrist.minimum.girth + Wrist.diameter, 
+                        data = BodyMeasurementsTrain)
+    
+    summary(body_forward_3)
+    
+    ```
 
-summary(body_backward)
-```
+    ```{r echo=FALSE}
+      body_forward_final <- lm(Weight ~ Waist.girth + Height + Thigh.girth + 
+                                 Forearm.girth + Shoulder.girth + Calf.maximum.girth + 
+                                 Hip.girth + Chest.girth + Knee.diameter + Age + 
+                              Chest.depth + Gender + Knee.girth + Wrist.minimum.girth + 
+                                Wrist.diameter, data = BodyMeasurementsTrain)
+    
+    summary(body_forward_final)
+    ```
 
 (c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
 

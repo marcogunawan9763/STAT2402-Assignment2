@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2 Submission"
-author: "Ian Chen and Marco Gunawan(23780778)"
+author: "Ian Chen (24227644) and Marco Gunawan(23780778)"
 date: "16/05/2025"
 output:
   pdf_document: default
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, comment="")
 
 Both people did both questions and discussed before submission.
 
-    ```{r echo=FALSE}
+    ```{r echo=FALSE,warning=FALSE}
     ## There are a few options in every chunk, click the setting button (greyed) near the triangle:
     # 1. to use default as in the above (show code and output, ie ECHO=TRUE) or 
     # 2. to show output only (ie ECHO=FALSE) or
@@ -53,16 +53,12 @@ Both people did both questions and discussed before submission.
     Mortality by State Code Analysis: Before we plotted out graph, I first examined the data, using table(pollution$State.code). Many of our states only have a singular datapoint and therefore are too small a sample size. Excluding the states with one datapoint we are left with 10 that we plot. The mean mortality rate differs greatly from each state. The states NY, PA, and OH have higher median mortality rates while CA and TX have significantly lower ones. States such as CA and PA having much wider interquartile range indicating a high variance. This suggests that the state an individual lives is relavent to their mortality rate.
     
     
-    ```{r echo=FALSE}
+    ```{r echo=FALSE,fig.height=3.75}
     pollution <- read.csv("Pollution.csv")
     
     #Climate EDA plot
     climate_variables <- pollution[, c("Mortality", "Precip", "Humidity", "JanTemp", "JulyTemp")]
     pairs(climate_variables, main = "Climate Variables vs Mortality")
-    
-    #Socioeconomic EDA plot
-    socioeconomic_variables <- pollution[, c("Mortality", "Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")]
-    pairs(socioeconomic_variables, main = "Socioeconomic Variables vs Mortality")
     
     #Pollution EDA plot
     pollution_variables <- pollution[, c("Mortality", "HC", "NOX", "SO2")]
@@ -89,6 +85,11 @@ Both people did both questions and discussed before submission.
         las = 2, col = "lightgreen")
     
     ```
+```{r echo=FALSE,fig.height=5}
+    #Socioeconomic EDA plot
+    socioeconomic_variables <- pollution[, c("Mortality", "Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")]
+    pairs(socioeconomic_variables, main = "Socioeconomic Variables vs Mortality")
+```
     
 (b) (9 marks) Perform model selection process using the all subset method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to differences in climate and socioeconomic factors. Identify optimal model(s) based on each of the adjusted R2 , BIC and $C_p$. Use a maximum of 10 variables for the selection. For each criterion, state the number and names of the selected variables.
     
@@ -144,29 +145,27 @@ Both people did both questions and discussed before submission.
     Taking a further look at influential points using leverage and Cook’s distance, I use the equations 
     Leverage cutoff = (2(p+1))/ n and cook's cutoff  2 * (p + 1) / (n - p - 1) to find influential points. Using these equations as well as the linear model we can find the points above the cutoffs. The data points that are above the cook's cutoff is data point 20, the city being York. The data points above the leverage cutoff is data points 3,7,8,19 and 20. Their cities are San Diego, Miami, Los Angeles,San Francisco and York.
     
-    ```{r}
+    
+    ```{r,fig.height=3.65}
     poll_data <- read.csv("Pollution.csv")
     cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + 
                      Density + NonWhite, data = poll_data)
-    
     # Model dimensions
     p <- length(coef(cp_model)) - 1
     n <- nrow(poll_data)
-    
     #Diagnostics Plot
     par(mfrow = c(2, 2))
     plot(cp_model)
-    
-    #The influential points are those with Cook's distance 
+    ```
+```{r,fig.height=3}
+#The influential points are those with Cook's distance 
     par(mfrow = c(1, 1))
     cook_cutoff <- 2 * (p + 1) / (n - p - 1)
     plot(cp_model, which = 5, cook.levels = cook_cutoff)
-    
     #Find Influential Points using Cook's Distance
     cooks_d <- cooks.distance(cp_model)
     cook_cutoff_points <- which(cooks_d > cook_cutoff)
     cat(cook_cutoff_points)
-  
     #Find high leverage
     lev_cutoff <- 2 * (p + 1) / n
     high_leverage <- which(hatvalues(cp_model) > lev_cutoff)
@@ -175,7 +174,7 @@ Both people did both questions and discussed before submission.
     #Find the Cities
     print(poll_data[cook_cutoff_points, "City"])
     print(poll_data[high_leverage, "City"])
-    ```
+```
     
     
 (e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
@@ -187,15 +186,12 @@ Both people did both questions and discussed before submission.
     ```{r}
     # Answer code here
     poll_data <- read.csv("Pollution.csv")
-    
     cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ 
                    + Density + NonWhite, 
                    data = poll_data)
-    
     cp_model_expanded <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ
                             + Density + NonWhite + log(HC) + log(NOX) +log(SO2), 
                             data = poll_data)
-    
     anova(cp_model, cp_model_expanded)
     
     ```
@@ -213,7 +209,7 @@ Both people did both questions and discussed before submission.
 
     As there are 26 variables, and producing a pairs plot would result in 625 scatterplots, resulting in a plot which is too dense to view meaningfully, we have opted for a heatmap analysis instead.
 
-    ```{r echo=FALSE}
+    ```{r echo=FALSE,fig.height=3.8}
     body_clean <- body[,c(-1)]
 
     # Calculate correlation matrix
@@ -234,7 +230,7 @@ Both people did both questions and discussed before submission.
 
     We begin by splitting the dataset into a training set and a testing set. Using both forward and backwards selection, we yield the following model equations.
 
-    ```{r echo=FALSE, message=FALSE, warning=FALSE}
+    ```{r echo=FALSE, message=FALSE, warning=FALSE,fig.height=3}
     gender_body <- body_clean
     gender_body$Gender <- factor(gender_body$Gender, labels = c("Female", "Male"))
 
@@ -358,7 +354,7 @@ Both people did both questions and discussed before submission.
 
     For Model 1:
 
-    ```{r echo=FALSE}
+    ```{r echo=FALSE,fig.height=4}
     par(mfrow = c(2, 2))
     model_1 <- body_forward_optimal
     plot(model_1)
@@ -368,7 +364,7 @@ Both people did both questions and discussed before submission.
 
     For Model 2:
 
-    ```{r echo = FALSE}
+    ```{r echo = FALSE,fig.height=4}
     model_2 <- body_backward_optimal
     par(mfrow = c(2, 2))
     plot(model_2)
@@ -387,7 +383,7 @@ Both people did both questions and discussed before submission.
     }
     ```
 
-    ```{r echo=FALSE}
+    ```{r echo=FALSE,fig.height=2.75}
     model_1_pred <- predict(model_1, BodyMeasurementsTest)
     model_2_pred <- predict(model_2, BodyMeasurementsTest)
 

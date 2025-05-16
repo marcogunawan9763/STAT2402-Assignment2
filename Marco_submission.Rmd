@@ -4,10 +4,11 @@ author: "Your name(s)"
 date: "submission date"
 output:
   pdf_document: default
+  fontsize: 12pt
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, comment="")
 ```
 
 # Statement of Contribution
@@ -31,6 +32,7 @@ State what each team member has contributed to the assignment before answering t
           library(gridExtra)
           library(purrr)
           library(knitr)
+          library(dplyr)
         })
     ```
 
@@ -38,7 +40,7 @@ State what each team member has contributed to the assignment before answering t
 
 (a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset.
 
-    **Answer:**
+    
 
     *Answer text here*
 
@@ -48,7 +50,7 @@ State what each team member has contributed to the assignment before answering t
 
 (b) (9 marks) Perform model selection process using the all subset method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to differences in climate and socioeconomic factors. Identify optimal model(s) based on each of the adjusted R2 , BIC and $C_p$. Use a maximum of 10 variables for the selection. For each criterion, state the number and names of the selected variables.
 
-    **Answer:**
+    
 
     *Answer text here*
 
@@ -58,7 +60,7 @@ State what each team member has contributed to the assignment before answering t
 
 (c) (4 marks) Fit the model with the lowest $C_p$ as obtained in (b). Write the equation of this fitted model. Interpret this model.
 
-    **Answer:**
+    
 
     *Answer text here*
 
@@ -68,7 +70,7 @@ State what each team member has contributed to the assignment before answering t
 
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
 
-    **Answer:**
+    
 
     *Answer text here*
 
@@ -78,7 +80,7 @@ State what each team member has contributed to the assignment before answering t
 
 (e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
 
-    **Answer:**
+    
 
     *Answer text here*
 
@@ -86,13 +88,11 @@ State what each team member has contributed to the assignment before answering t
     # Answer code here
     ```
 
+\newpage
 # Question 2: Body Measurements (25 marks)
 
 (a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling.
 
-    **Answer:**
-    
-    First, we have a peek at the variables of the dataset using the names() function.
     ```{r include=FALSE}
     body <- read.csv("body.csv")
     names(body)
@@ -111,11 +111,17 @@ State what each team member has contributed to the assignment before answering t
     corrplot(cor_matrix, method = "color", type = "upper", 
              order = "hclust", tl.col = "black", tl.cex = 0.7) 
     ```
-    Strong positive correlations appear as dark blue squares, showing many body measurements are highly correlated with each other. Having a look at the heatmap itself, we can see that particularly weight, waist girth, chest girth and various other girth measurements appears to be strongly correlated. Furthermore, Gender shows moderate to strong correlations with many variables (visible in the bottom row), suggesting body measurements differ significantly between genders. Whilst Age seems to have little to no correlation to any other variables.
+    Having a look at the heatmap itself, we can see that particularly weight, waist girth, chest girth and various other girth measurements appears to be strongly correlated. 
     
     As gender is a categorical variable, I decided to create boxplots for further analysis with the numeric variables that are most strongly correlated to gender.
     
-    ```{r echo=FALSE, message=FALSE, warning=FALSE}
+    For the main response variable, weight, we can see that male has a notably higher median weight (~78kg) to female's median at (~60kg). Both groups show some outliers at the upper end, particularly among females. These measurements show clear sexual dimorphism in human body proportions, with minimal overlap in distributions for measurements like height and waist girth. 
+    
+(b) (10 marks) After the exploratory analysis has been carried out, construct two multiple linear regression models for this dataset using the training set.
+
+    We begin by splitting the dataset into a training set and a testing set. Using both forward and backwards selection, we yield the following model equations.
+    
+    ```{r echo=FALSE, message=FALSE, warning=FALSE, }
     gender_body <- body_clean
     gender_body$Gender <- factor(gender_body$Gender, labels = c("Female", "Male"))
     
@@ -132,14 +138,6 @@ State what each team member has contributed to the assignment before answering t
     
     grid.arrange(grobs = plots, ncol = 2)
     ```
-
-    For the main response variable, weight, we can see that male has a notably higher median weight (~78kg) to female's median at (~60kg). Both groups show some outliers at the upper end, particularly among females. These measurements show clear sexual dimorphism in human body proportions, with minimal overlap in distributions for measurements like height and waist girth. 
-
-(b) (10 marks) After the exploratory analysis has been carried out, construct a multiple linear regression model for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Compare them in a few concise sentences.
-
-    **Answer:**
-
-    We begin by splitting the dataset into a training set and a testing set. Using both forward and backwards selection, we yield the following model equations.
 
     ```{r}
     # Data Selection
@@ -182,17 +180,15 @@ State what each team member has contributed to the assignment before answering t
     The first model given by the forward AIC step function (Model 1) is shown below:
     ```{r echo=FALSE}
     #further work on the forward selection model
-    summary(body_forward)
+    (summary(body_forward))
     ```
     
     And similarly, for the backward AIC step function (Model 2)
     ```{r echo=FALSE}
     #backward selection model
-    summary(body_backward)
+    (summary(body_backward))
     ```
-    We notice that there are some variables tha tare a apart of this model that are not statistically significant, that is, their p-value is greater than 0.1. The initial method was to take away these variables with the largest p-value sequentially until all statistically non-significant variables have been removed or until the overall model fit (adjusted R-squared, AIC, BIC) significantly worsen. After this method however, the results of the final two models were identical.
-    
-    To yield two seperate models to be able to be compared however, we instead decided to remove all non-significant variables at once. And doing so sequentially, until all non-significant variables have been removed or until the overall model fit (adjusted R-squared, AIC, BIC) significantly worsen. 
+    We notice that there are some variables tha tare a apart of this model that are not statistically significant, that is, their p-value is greater than 0.1. To yield two seperate models to be able to be compared however, we instead decided to remove all non-significant variables at once. And doing so sequentially, until all non-significant variables have been removed or until the overall model fit (adjusted R-squared, AIC, BIC) significantly worsen. 
     
     ```{r include=FALSE}
     body_forward_large_1 <- lm(formula = Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
@@ -237,38 +233,81 @@ State what each team member has contributed to the assignment before answering t
     ```{r echo=FALSE}
         kable(summary(body_backward_optimal)$coefficients, digits = 4)
     ```
-    We can see that all predictors are statistically significant with the intercept being -120, which also hsa no real meaning. Model 2's final adjusted R-squared value was 0.9747, with a F-statistic 1041 on 15 and 390 DF. Model 2's final variables includes Chest.depth , Wrist.diameter , Knee.diameter , Shoulder.girth , Chest.girth , Waist.girth , Hip.girth , Thigh.girth , Forearm.girth , Knee.girth , Calf.maximum.girth , Wrist.minimum.girth , Age , Height , Gender
+    We can see that all predictors are statistically significant with the intercept being -120, which also has no real meaning. Model 2's final adjusted R-squared value was 0.9747, with a F-statistic 1041 on 15 and 390 DF. Model 2's final variables includes Chest.depth , Wrist.diameter , Knee.diameter , Shoulder.girth , Chest.girth , Waist.girth , Hip.girth , Thigh.girth , Forearm.girth , Knee.girth , Calf.maximum.girth , Wrist.minimum.girth , Age , Height , Gender.
 
 (c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
-    **Answer:**
+    
+    For model 1:
 
-    *Answer text here*
-
-    ```{r}
-    # Answer code here
+    ```{r echo=FALSE}
+    par(mfrow = c(2, 2))
+    model_1 <- body_forward_optimal
+    plot(model_1)
     ```
-
+    
+    The diagnostic plots indicate the the residuals are not mean zero. The Q-Q plot The points follow the diagonal line fairly well indicating the residuals are approximately normally distributed. The scale-location plot suggests the variance may also not be constant. Finally, no influential points are detected.
+    
+    For Model 2:
+    
+    ``` {r echo = FALSE}
+    model_2 <- body_backward_optimal
+    par(mfrow = c(2, 2))
+    plot(model_2)
+    ```
+    
+    The diagnostic plots indicate the the residuals are not mean zero though slighlty better than Model 1. The Q-Q plot The points follow the diagonal line fairly well indicating the residuals are approximately normally distributed. The scale-location plot suggests the variance may also not be constant. And no influential points are detected.
+    
 (d) (6 marks). Despite any inadequacies that you may or may not have identified above, you use the two models obtained in (b) to make predictions of Weight in the test set.
 
-(e) Produce a correctly drawn and labelled plot of predicted values against the actual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model.
+    (i) Produce a correctly drawn and labelled plot of predicted values against the actual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model.
 
-<!-- -->
+    ```{r include=FALSE}
+    # We put the RMSPE calculation in a function
+    rmspe <- function(pred, actual) {
+      sqrt(mean((actual - pred)**2))
+    }
+    ```
+    
+    ```{r echo=FALSE}
+    model_1_pred <- predict(model_1, BodyMeasurementsTest)
+    model_2_pred <- predict(model_2, BodyMeasurementsTest)
+    
+    prediction_data <- data.frame(
+    ActualValue = BodyMeasurementsTest$Weight, # Assuming Weight is the target variable
+    Model1_Prediction = model_1_pred,
+    Model2_Prediction = model_2_pred
+    )
+    
+    # Graph for Model 1
+    plot1 <- ggplot(prediction_data, aes(x = ActualValue, y = Model1_Prediction)) +
+    geom_point(alpha = 0.6, color = "darkblue") +
+    geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+    labs(title = "Model 1 Predictions vs Actual",
+         x = "Actual Values",
+         y = "Predicted Values") +
+    theme_minimal() +
+    annotate("text", x = min(prediction_data$ActualValue) + 0.1 * diff(range(prediction_data$ActualValue)), y = max(prediction_data$Model1_Prediction) - 0.1 * diff(range(prediction_data$Model1_Prediction)), label = paste("RMSE =", round(sqrt(mean((prediction_data$ActualValue - prediction_data$Model1_Prediction)^2)), 3)))
+    
+    # Graph for Model 2
+    plot2 <- ggplot(prediction_data, aes(x = ActualValue, y = Model2_Prediction)) +
+    geom_point(alpha = 0.6, color = "darkgreen") +
+    geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+    labs(title = "Model 2 Predictions vs Actual", x = "Actual Values", y = "Predicted Values") + theme_minimal() + annotate("text", x = min(prediction_data$ActualValue) + 0.1 * diff(range(prediction_data$ActualValue)), y = max(prediction_data$Model2_Prediction) - 0.1 * diff(range(prediction_data$Model2_Prediction)), label = paste("RMSE =", round(sqrt(mean((prediction_data$ActualValue - prediction_data$Model2_Prediction)^2)), 3)))
+    
+    # Arrange plots side by side
+    grid.arrange(plot1, plot2, ncol = 2)
+    ```
 
-(ii) Using the RMSEPs and the plots you produced, comment on how well the models performed.
+    (ii) Using the RMSEPs and the plots you produced, comment on how well
+    the models performed.
+    
+    Both models appear to perform very similarly based on the visual plots and their RMSE (Root Mean Square Error of Prediction) values:
+    
+    - Model 1 has an RMSE of 1.917
+    - Model 2 hsa a RMSE of 1.963
+    
+    Given the small difference in RMSE values and the similar visual patterns, both models appear to be performing well, with Model 1 having a marginally better overall performance based on the slightly lower RMSE.
 
-````         
-**Answer:**
-
-*Answer text here*
-
-```{r}
-# Answer code here
-```
-````
-
-
-
-APPENDIX
     ```{r include=FALSE}
     #first removed <- elbow diameter
     body_forward_1 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
@@ -279,7 +318,7 @@ APPENDIX
     
     data = BodyMeasurementsTrain)
     
-    summary(body_forward_1)
+    (summary(body_forward_1))
     
     
     #first removed <- bicep girth

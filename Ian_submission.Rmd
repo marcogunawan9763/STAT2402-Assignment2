@@ -32,17 +32,16 @@ State what each team member has contributed to the assignment before answering t
 
     **Answer:**
     
-    Climate EDA: The Mortality-Precip plot shows a strong postive linear relationship, indicating that as the precipitation increases, so does the Mortality. The Mortality-Humidity plot shows no clear relationship. The Mortality-JanTemp plot depeicts either no clear relationship or a very weak negative relationship. Lastly the Mortality-JulyTemp plot depicts a moderate positive relationship with a few outliers. 
+    Climate EDA: The Mortality-Precip plot shows a strong postive linear relationship, indicating that as the precipitation increases, so does the Mortality. The Mortality-Humidity plot shows no clear relationship as datapoints appear randomly scattered. The Mortality-JanTemp plot depeicts either no clear relationship or a very weak negative relationship. Lastly the Mortality-JulyTemp plot depicts a moderate positive relationship with a few outliers. 
     
-    Socioeconomic Variables EDA: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    Socioeconomic Variables EDA: From the pairs plot, we can see that the Mortality-Over65 graph appears to have no apparent relationship.The Mortality-House plot shows a weak to moderate positive relationship. The Mortality-Educ plot shows a strong negative relationship. The Mortality-Sound plot shows a moderate to strong negative relationship. The Mortality-Density plot has a Moderate positive relationship. The Mortality-NonWhite plot shows a strong positive relationship. The Mortality-WhiteCol plot shows no clear relationship. Lastly the Mortality-Poor plot shows a moderate positive relationship.
     
-    Pollution Variables EDA: The Mortality-HC plot shows no correlation between the two variables, same with the Mortality-NOX plot. However the Mortality SO2 plot depoicts a Moderate positive relationship. This means as the SO2 increases so does mortality.
+    Pollution Variables EDA: The Mortality-HC plot shows no correlation between the two variables, same with the Mortality-NOX plot.This is because the datapoints appear randomly scattered. However the Mortality SO2 plot depoicts a Moderate positive relationship. This means as the SO2 increases so does mortality.
     
-    Mortality by Region Analysis: The south region has the highest rates of mortality, the highest median (975) as well as the widest range. The median and range are notably higher than then rest of the regions. The West region has the lowest average mortality rate (875) as well as the most narrow spread. The Midwest and Northeast are similar in average values (~940) and an outlier in the Midwest data. The regional differences stated suggests that the region a personn lives in may influence their mortality rate.
+    Mortality by Region Analysis: The south region has the highest rates of mortality, the highest median (975) as well as the widest range. The median and range are notably higher than then rest of the regions. The West region has the lowest average mortality rate (875) as well as the most narrow spread. The Midwest and Northeast are similar in average values (~940) and an outlier in the Midwest data. The regional differences stated suggests that the region a person lives in may influence their mortality rate.
     
     
-    Mortality by State Code Analysis: 
-
+    Mortality by State Code Analysis: Before we plotted out graph, I first examined the data, using table(pollution$State.code). Many of our states only have a singular datapoint and therefore are too small a sample size. Excluding the states with one datapoint we are left with 10 that we plot. The mean mortality rate differs greatly from each state. The states NY, PA, and OH have higher median mortality rates while CA and TX have significantly lower ones. States such as CA and PA having much wider interquartile range indicating a high variance. This suggests that the state an individual lives is relavent to their mortality rate.
 
 
 
@@ -89,7 +88,7 @@ boxplot(Mortality ~ Region, data = pollution,
 
     **Answer:**
 
-    *Answer text here*
+    
 
     ```{r}
 library(leaps)

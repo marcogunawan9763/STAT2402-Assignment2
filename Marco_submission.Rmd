@@ -16,15 +16,23 @@ Include this if pairing.
 
 State what each team member has contributed to the assignment before answering the questions. Each student must contribute towards ALL questions. Your assignment will not be marked without this statement.
 
-```{r eval=FALSE, include=FALSE}
-## There are a few options in every chunk, click the setting button (greyed) near the triangle:
-# 1. to use default as in the above (show code and output, ie ECHO=TRUE) or 
-# 2. to show output only (ie ECHO=FALSE) or
-# 3. show nothing (run code) ie include=FALSE
-# 4. show nothing (dont run the code), like this chunk, ie eval=FALSE, include=FALSE
-## You can knit this template into Word and then update it into pdf etc..
-## You can create your own way for submission, this is just an example if you are going to use Rmd.
-```
+    ```{r echo=FALSE}
+    ## There are a few options in every chunk, click the setting button (greyed) near the triangle:
+    # 1. to use default as in the above (show code and output, ie ECHO=TRUE) or 
+    # 2. to show output only (ie ECHO=FALSE) or
+    # 3. show nothing (run code) ie include=FALSE
+    # 4. show nothing (dont run the code), like this chunk, ie eval=FALSE, include=FALSE
+    ## You can knit this template into Word and then update it into pdf etc..
+    ## You can create your own way for submission, this is just an example if you are going to use Rmd.
+    
+    suppressPackageStartupMessages({
+          library(corrplot)
+          library(ggplot2)
+          library(gridExtra)
+          library(purrr)
+          library(knitr)
+        })
+    ```
 
 # Question 1: Air Pollution and Mortality. Does pollution kill people? (30 marks)
 
@@ -85,10 +93,9 @@ State what each team member has contributed to the assignment before answering t
     **Answer:**
     
     First, we have a peek at the variables of the dataset using the names() function.
-    ```{r echo=FALSE}
+    ```{r include=FALSE}
     body <- read.csv("body.csv")
     names(body)
-    
     ```
     
     Using str() and with the information provided with the task, we know that the dataset is mostly numeric, with 26 variables. With two variables standing out, primarily, X (the row index) and gender (a factor with two levels). I cleaned the data by removing X and performing EDA from then on.
@@ -96,8 +103,6 @@ State what each team member has contributed to the assignment before answering t
     As there are 26 variables, and producing a pairs plot would result in 625 scatterplots, resulting in a plot which is too dense to view meaningfully, we have opted for a heatmap analysis instead.
     ```{r echo=FALSE}
     body_clean <- body[,c(-1)]
-    
-    library(corrplot)
     
     # Calculate correlation matrix
     cor_matrix <- cor(body_clean, use = "complete.obs")
@@ -110,48 +115,131 @@ State what each team member has contributed to the assignment before answering t
     
     As gender is a categorical variable, I decided to create boxplots for further analysis with the numeric variables that are most strongly correlated to gender.
     
-```{r}
-# For multiple variables in a grid
-library(ggplot2)
-library(gridExtra)
-library(purrr)
-
-gender_body <- body_clean
-gender_body$Gender <- factor(gender_body$Gender, labels = c("Female", "Male"))
-
-# Function to create individual boxplots
-create_boxplot <- function(var_name) {
-  ggplot(gender_body, aes_string(x = "factor(Gender)", y = var_name, fill = "factor(Gender)")) +
-    geom_boxplot() +
-    labs(title = paste(var_name, "by Gender"), x = "Gender", y = var_name) +
-    theme_minimal() +
-    theme(legend.position = "none")
-}
-
-# Select variables with strongest gender correlation
-gender_related_vars <- c("Weight", "Height", "Waist.girth", "Elbow.diameter")
-
-# Create plots
-plots <- map(gender_related_vars, create_boxplot)
-
-# Arrange in a grid
-grid.arrange(grobs = plots, ncol = 2)
-```
+    ```{r echo=FALSE, message=FALSE, warning=FALSE}
+    gender_body <- body_clean
+    gender_body$Gender <- factor(gender_body$Gender, labels = c("Female", "Male"))
+    
+    create_boxplot <- function(var_name) {
+      ggplot(gender_body, aes(x = factor(Gender), y = .data[[var_name]], fill = factor(Gender))) +
+        geom_boxplot() +
+        labs(title = paste(var_name, "by Gender"), x = "Gender", y = var_name) +
+        theme_minimal() +
+        theme(legend.position = "none")
+    }
+    
+    gender_related_vars <- c("Weight", "Height", "Waist.girth", "Elbow.diameter")
+    plots <- map(gender_related_vars, create_boxplot)
+    
+    grid.arrange(grobs = plots, ncol = 2)
+    ```
 
     For the main response variable, weight, we can see that male has a notably higher median weight (~78kg) to female's median at (~60kg). Both groups show some outliers at the upper end, particularly among females. These measurements show clear sexual dimorphism in human body proportions, with minimal overlap in distributions for measurements like height and waist girth. 
 
-(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80% of the data and the testing set contains 20%. Construct a multiple linear regression model for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Write the two fitted model equations and compare them in a few concise sentences.
+(b) (10 marks) After the exploratory analysis has been carried out, construct a multiple linear regression model for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Compare them in a few concise sentences.
 
     **Answer:**
 
-    *Answer text here*
+    We begin by splitting the dataset into a training set and a testing set. Using both forward and backwards selection, we yield the following model equations.
 
     ```{r}
-    # Answer code here
+    # Data Selection
+    set.seed(2401)
+    test_index <- sample(nrow(body_clean), floor(0.2 * nrow(body_clean)))
+    BodyMeasurementsTrain <- body_clean[-test_index, ]
+    BodyMeasurementsTest <- body_clean[test_index, ]
+    
+    ```
+    
+    ```{r echo = FALSE}
+    #Multiple Linear Regression Model
+    set.seed(2401) #set seed for reproducibility
+    body_lm <- lm(Weight ~ ., data = BodyMeasurementsTrain)
+    body_lm_intercept_only <- lm(Weight ~ 1, data = BodyMeasurementsTrain)
+    
+    #Forward Selection
+    body_forward <- step(
+      body_lm_intercept_only, 
+      scope = ~ (
+        Biacromial.diameter + Biiliac.diameter + Bitrochanteric.diameter +
+        Chest.depth + Chest.diameter + Elbow.diameter + Wrist.diameter +
+        Knee.diameter + Ankle.diameter + Shoulder.girth + Chest.girth +
+        Waist.girth + Navel.girth + Hip.girth + Thigh.girth + Bicep.girth +
+        Forearm.girth + Knee.girth + Calf.maximum.girth + Ankle.minimum.girth +
+        Wrist.minimum.girth + Age + Height + Gender
+      ),
+      direction = 'forward',
+      trace = 0)
+
+    
+    #Backwards Selection
+    body_backward <- step(
+      body_lm,
+      direction = 'backward',
+      trace = 0
+    )
     ```
 
-(c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
+    The first model given by the forward AIC step function (Model 1) is shown below:
+    ```{r echo=FALSE}
+    #further work on the forward selection model
+    summary(body_forward)
+    ```
+    
+    And similarly, for the backward AIC step function (Model 2)
+    ```{r echo=FALSE}
+    #backward selection model
+    summary(body_backward)
+    ```
+    We notice that there are some variables tha tare a apart of this model that are not statistically significant, that is, their p-value is greater than 0.1. The initial method was to take away these variables with the largest p-value sequentially until all statistically non-significant variables have been removed or until the overall model fit (adjusted R-squared, AIC, BIC) significantly worsen. After this method however, the results of the final two models were identical.
+    
+    To yield two seperate models to be able to be compared however, we instead decided to remove all non-significant variables at once. And doing so sequentially, until all non-significant variables have been removed or until the overall model fit (adjusted R-squared, AIC, BIC) significantly worsen. 
+    
+    ```{r include=FALSE}
+    body_forward_large_1 <- lm(formula = Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+    Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+    Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+    Chest.diameter + Wrist.minimum.girth, data = BodyMeasurementsTrain)
+    
+    summary(body_forward_large_1)
+    
+    body_backwards_large_1 <- lm(formula = Weight ~ Chest.depth + Chest.diameter + Wrist.diameter + 
+    Knee.diameter + Shoulder.girth + Chest.girth + Waist.girth + 
+    Hip.girth + Thigh.girth + Forearm.girth + Knee.girth + 
+    Calf.maximum.girth + Wrist.minimum.girth + Age + Height + 
+    Gender, data = BodyMeasurementsTrain)
+    
+    summary(body_backwards_large_1)
+    ```
+    ```{r include=FALSE}
+    #final model summary for forward selection
+    body_forward_optimal <- lm(formula = Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+    Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+    Knee.diameter + Age + Chest.depth + Gender + Knee.girth, data = BodyMeasurementsTrain)
+    
+    summary(body_forward_optimal)
+    
+    #final model summary for backward selection
+    body_backward_optimal<- lm(formula = Weight ~ Chest.depth + Wrist.diameter +  
+                                 Knee.diameter + Shoulder.girth + Chest.girth + 
+                                 Waist.girth + Hip.girth + Thigh.girth + Forearm.girth +
+                                 Knee.girth + Calf.maximum.girth + Wrist.minimum.girth +
+                                 Age + Height + Gender, 
+                               data = BodyMeasurementsTrain)
+    summary(body_backward_optimal)
+    ```
+    Thus, in the end we yield Model 1:
+    ```{r echo=FALSE}
+    kable(summary(body_forward_optimal)$coefficients, digits = 4)
+    ```
+    We can see that all predictors in our model are statistically significant at the p < 0.1 level, with the intercept being -121, which has no real meaning as someone could never have negative weight. Model 1's final adjusted R-squared value was 0.9744, with a F-statistic 1189 on 13 and 392 DF. Model 1's final variables includes Waist.girth, Height, Thigh.girth, Forearm.girth, Shoulder.girth, Calf.maximum.girth, Hip.girth, Chest.girth, Knee.diameter, Age, Chest.depth, Gender and Knee.girth.
 
+    And similarly, for Model 2:
+    ```{r echo=FALSE}
+        kable(summary(body_backward_optimal)$coefficients, digits = 4)
+    ```
+    We can see that all predictors are statistically significant with the intercept being -120, which also hsa no real meaning. Model 2's final adjusted R-squared value was 0.9747, with a F-statistic 1041 on 15 and 390 DF. Model 2's final variables includes Chest.depth , Wrist.diameter , Knee.diameter , Shoulder.girth , Chest.girth , Waist.girth , Hip.girth , Thigh.girth , Forearm.girth , Knee.girth , Calf.maximum.girth , Wrist.minimum.girth , Age , Height , Gender
+
+(c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
     **Answer:**
 
     *Answer text here*
@@ -177,3 +265,74 @@ grid.arrange(grobs = plots, ncol = 2)
 # Answer code here
 ```
 ````
+
+
+
+APPENDIX
+    ```{r include=FALSE}
+    #first removed <- elbow diameter
+    body_forward_1 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+    Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+    Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+    Chest.diameter + Bicep.girth + Wrist.minimum.girth + 
+    Wrist.diameter, 
+    
+    data = BodyMeasurementsTrain)
+    
+    summary(body_forward_1)
+    
+    
+    #first removed <- bicep girth
+    body_backward_1 <- lm(formula = Weight ~ Chest.depth + Chest.diameter + 
+                            Wrist.diameter + Knee.diameter + Shoulder.girth + 
+                            Chest.girth + Waist.girth + Hip.girth + Thigh.girth + 
+                            Forearm.girth + Knee.girth + Calf.maximum.girth + 
+                            Wrist.minimum.girth + Age + Height + Gender, 
+                          data = BodyMeasurementsTrain)
+    summary(body_backward_1)
+    ```
+    
+    ```{r include=FALSE}
+    #second remove
+    body_forward_2 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+                        Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+                          Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+                          Bicep.girth + Wrist.minimum.girth + 
+                          Wrist.diameter, 
+                        data = BodyMeasurementsTrain)
+    
+    summary(body_forward_2)
+    
+    #body backwards have reached 'optimal' solution
+    body_backward_final <- lm(formula = Weight ~ Chest.depth + 
+                            Wrist.diameter + Knee.diameter + Shoulder.girth + 
+                            Chest.girth + Waist.girth + Hip.girth + Thigh.girth + 
+                            Forearm.girth + Knee.girth + Calf.maximum.girth + 
+                            Wrist.minimum.girth + Age + Height + Gender, 
+                          data = BodyMeasurementsTrain)
+    
+    ```
+    
+    ```{r include=FALSE}
+    #third removed
+    body_forward_3 <- lm(Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+                        Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+                          Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+                          Chest.diameter + Wrist.minimum.girth + Wrist.diameter, 
+                        data = BodyMeasurementsTrain)
+    
+    summary(body_forward_3)
+    
+    ```
+
+    ```{r include=FALSE}
+    #final remove of forwards
+    body_forward_final <- lm(Weight ~ Waist.girth + Height + Thigh.girth + 
+                                 Forearm.girth + Shoulder.girth + Calf.maximum.girth + 
+                                 Hip.girth + Chest.girth + Knee.diameter + Age + 
+                              Chest.depth + Gender + Knee.girth + Wrist.minimum.girth + 
+                                Wrist.diameter, data = BodyMeasurementsTrain)
+    
+    summary(body_forward_final)
+    summary(body_backward_final)
+    ```

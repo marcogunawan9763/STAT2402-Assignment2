@@ -4,10 +4,11 @@ author: "Your name(s)"
 date: "submission date"
 output:
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, comment="")
 ```
 
 # Statement of Contribution
@@ -46,7 +47,6 @@ State what each team member has contributed to the assignment before answering t
 
 
     *Answer text here*
-
 ```{r echo=FALSE}
 pollution <- read.csv("Pollution.csv")
     
@@ -81,8 +81,7 @@ boxplot(Mortality ~ Region, data = pollution,
         main = "Mortality by Region",
         xlab = "Region", ylab = "Mortality",
         las = 2, col = "lightgreen")
-
-    ```
+```
 
 (b) (9 marks) Perform model selection process using the all subset method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to differences in climate and socioeconomic factors. Identify optimal model(s) based on each of the adjusted R2 , BIC and $C_p$. Use a maximum of 10 variables for the selection. For each criterion, state the number and names of the selected variables.
 
@@ -91,7 +90,6 @@ For the adjusted R^2 model, we have 7 variables. Those variables are Precip, Jan
 For the BIC model, we have 4 variables. Those variables are JanTemp, House, Educ and NonWhite.
 For the Cp model, we have 6 variables. Those variables are Precip, JanTemp, JulyTemp, Educ, Density and NonWhite.
     
-
 ```{r echo=FALSE}
 library(leaps)
 source("all-subsets-lm.R")
@@ -111,7 +109,8 @@ allsubsets_c_p   <- all_subsets_lm(model, criterion = "Cp", p_max = 10)
 allsubsets_adjR2$variables
 allsubsets_bic$variables
 allsubsets_c_p$variables
-    ```
+```
+
     
 
 (c) (4 marks) Fit the model with the lowest $C_p$ as obtained in (b). Write the equation of this fitted model. Interpret this model.
@@ -122,54 +121,53 @@ Equation: Mortality = 1242.0+  1.401 * Precip -1.684 * JanTemp - 2.8 * JulyTemp 
 
 Interpretation: From viewing the model summary, the R^2 value tells us that the model explains approximately 70.86% of the variation in the data's mortality rate. The model summary also tells us the F-Statistic and the p-value. Those being 21.48 and 1.305e-12 respectively. The large F-statistic (1<) suggests that the model has significant variables chosen. The small p-value (0.05>) also is evidence against the null hypothosies and that our model is statically significant. We then interpretthe coefficients for our model. A unit increase in Precip increases the rate by 1.401 deaths per 100,000. For each degree increase in JanTemp, mortality rate decreases by 1.684 deaths per 100,000. For each degree increase in JulyTemp, mortality rate decreases by 2.840 deaths per 100,000. Every year spend in education decreases the mortality rate by 16.16 per 100,000. Per unit increase in Density, the mortality rate increases by  0.00757 per 100,000. For every percentage increase in NonWhite, the mortality increases by 5.275 deaths per 100,000.
 
-
 ```{r echo=FALSE}
 poll_data <- read.csv("Pollution.csv")
     cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
     
 summary(cp_model)
-    ```
+```
+
 
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
 
-    **Answer:**
+
 We first generate our diagnostic plots, checking the Residuals vs Fitted, Q-Q Residuals , Scale-Location and Residuals vs Leverage. The Residuals vs Fitted has a mostly random scatter of data points. There's minor curvature at the right end but overall this plot suggests the relationship is approximately linear. The Q-Q Residuals follows the diagonal line closely with minor deviations at the ends. Overall, the plot suggests that the residuals are approximately normally distributed.The Scale Location is fairly horizontal however towards the right end it appears to curve upwards. This suggests the variance may be slightly uneven. The Residuals vs Leverage plot depicts data points that require further investigation as they have a high leverage and are far from x=0. 
 
 Taking a further look at influential points using leverage and Cook’s distance, I use the equations 
 Leverage cutoff = (2(p+1))/ n and cook's cutoff  2 * (p + 1) / (n - p - 1) to find influential points. Using these equations as well as the linear model we can find the points above the cutoffs. The data points that are above the cook's cutoff is data point 20, the city being York. The data points above the leverage cutoff is data points 3,7,8,19 and 20. Their cities are San Diego, Miami, Los Angeles,San Francisco and York.
 
-    *Answer text here*
 
     ```{r}
-poll_data <- read.csv("Pollution.csv")
-cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
+    poll_data <- read.csv("Pollution.csv")
+    cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
 
-# Model dimensions
-p <- length(coef(cp_model)) - 1
-n <- nrow(poll_data)
+    # Model dimensions
+    p <- length(coef(cp_model)) - 1
+    n <- nrow(poll_data)
 
-#Diagnostics Plot
-par(mfrow = c(2, 2))
-plot(cp_model)
+    #Diagnostics Plot
+    par(mfrow = c(2, 2))
+    plot(cp_model)
 
-#The influential points are those with Cook's distance 
-par(mfrow = c(1, 1))
-cook_cutoff <- 2 * (p + 1) / (n - p - 1)
-plot(cp_model, which = 5, cook.levels = cook_cutoff)
+    #The influential points are those with Cook's distance 
+    par(mfrow = c(1, 1))
+    cook_cutoff <- 2 * (p + 1) / (n - p - 1)
+    plot(cp_model, which = 5, cook.levels = cook_cutoff)
 
-#Find Influential Points using Cook's Distance
-cooks_d <- cooks.distance(cp_model)
-cook_cutoff_points <- which(cooks_d > cook_cutoff)
-print(cook_cutoff_points)
+    #Find Influential Points using Cook's Distance
+    cooks_d <- cooks.distance(cp_model)
+    cook_cutoff_points <- which(cooks_d > cook_cutoff)
+    print(cook_cutoff_points)
 
-#Find high leverage
-lev_cutoff <- 2 * (p + 1) / n
-high_leverage <- which(hatvalues(cp_model) > lev_cutoff)
-print (high_leverage)
+    #Find high leverage
+    lev_cutoff <- 2 * (p + 1) / n
+    high_leverage <- which(hatvalues(cp_model) > lev_cutoff)
+    print (high_leverage)
 
-#Find the Cities
-print(poll_data[cook_cutoff_points, "City"])
-print(poll_data[high_leverage, "City"])
+    #Find the Cities
+    print(poll_data[cook_cutoff_points, "City"])
+    print(poll_data[high_leverage, "City"])
 
 
     ```
@@ -192,49 +190,3 @@ cp_model_expanded <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density
 anova(cp_model, cp_model_expanded)
     
     ```
-
-# Question 2: Body Measurements (25 marks)
-
-(a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling.
-
-    **Answer:**
-
-    *Answer text here*
-
-(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80% of the data and the testing set contains 20%. Construct two multiple linear regression 3 models for this dataset using the training set based on the following variable selection methods: • (Model 1) The Forward selection; • (Model 2) The Backward selection. Write the two fitted model equations and compare them in a few concise sentences.
-
-    **Answer:**
-
-    *Answer text here*
-
-    ```{r}
-    # Answer code here
-    ```
-
-(c) (5 marks) Perform diagnostics checking for each of the final fitted models, Model 1 and Model 2 respectively.
-
-    **Answer:**
-
-    *Answer text here*
-
-    ```{r}
-    # Answer code here
-    ```
-
-(d) (6 marks). Despite any inadequacies that you may or may not have identified above, you use the two models obtained in (b) to make predictions of Weight in the test set.
-
-(e) Produce a correctly drawn and labelled plot of predicted values against the actual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model.
-
-<!-- -->
-
-(ii) Using the RMSEPs and the plots you produced, comment on how well the models performed.
-
-````         
-**Answer:**
-
-*Answer text here*
-
-```{r}
-# Answer code here
-```
-````

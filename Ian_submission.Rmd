@@ -47,7 +47,7 @@ State what each team member has contributed to the assignment before answering t
 
     *Answer text here*
 
-    ```{r}
+```{r echo=FALSE}
 pollution <- read.csv("Pollution.csv")
     
 #Climate EDA plot
@@ -86,11 +86,13 @@ boxplot(Mortality ~ Region, data = pollution,
 
 (b) (9 marks) Perform model selection process using the all subset method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to differences in climate and socioeconomic factors. Identify optimal model(s) based on each of the adjusted R2 , BIC and $C_p$. Use a maximum of 10 variables for the selection. For each criterion, state the number and names of the selected variables.
 
-    **Answer:**
 
+For the adjusted R^2 model, we have 7 variables. Those variables are Precip, JanTemp, JulyTemp, House, Educ, Density and NonWhite.
+For the BIC model, we have 4 variables. Those variables are JanTemp, House, Educ and NonWhite.
+For the Cp model, we have 6 variables. Those variables are Precip, JanTemp, JulyTemp, Educ, Density and NonWhite.
     
 
-    ```{r}
+```{r echo=FALSE}
 library(leaps)
 source("all-subsets-lm.R")
   
@@ -118,52 +120,66 @@ allsubsets_c_p$variables
 
 Equation: Mortality = 1242.0+  1.401 * Precip -1.684 * JanTemp - 2.8 * JulyTemp -16.16 * Educ + 0.00757 * Density + 5.275 * Nonwhite
 
-Interpretation: Will write later aaaaaaaaaaaa
+Interpretation: From viewing the model summary, the R^2 value tells us that the model explains approximately 70.86% of the variation in the data's mortality rate. The model summary also tells us the F-Statistic and the p-value. Those being 21.48 and 1.305e-12 respectively. The large F-statistic (1<) suggests that the model has significant variables chosen. The small p-value (0.05>) also is evidence against the null hypothosies and that our model is statically significant. We then interpretthe coefficients for our model. A unit increase in Precip increases the rate by 1.401 deaths per 100,000. For each degree increase in JanTemp, mortality rate decreases by 1.684 deaths per 100,000. For each degree increase in JulyTemp, mortality rate decreases by 2.840 deaths per 100,000. Every year spend in education decreases the mortality rate by 16.16 per 100,000. Per unit increase in Density, the mortality rate increases by  0.00757 per 100,000. For every percentage increase in NonWhite, the mortality increases by 5.275 deaths per 100,000.
 
-Things to mention: 
 
-  Model Performance
-    - R^2 / Variation
-    - F-test (p value)
-  Coefficient Interpretations 
-    - legit just say what each thing does to the mortality
-    
-    *Answer text here*
-
-    ```{r}
+```{r echo=FALSE}
 poll_data <- read.csv("Pollution.csv")
     cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
     
 summary(cp_model)
-
-
     ```
 
 (d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook’s distance respectively.
 
     **Answer:**
-Yes there are influential points in the data, those being 7,20,60 and (find the ones not shown :P )
+We first generate our diagnostic plots, checking the Residuals vs Fitted, Q-Q Residuals , Scale-Location and Residuals vs Leverage. The Residuals vs Fitted has a mostly random scatter of data points. There's minor curvature at the right end but overall this plot suggests the relationship is approximately linear. The Q-Q Residuals follows the diagonal line closely with minor deviations at the ends. Overall, the plot suggests that the residuals are approximately normally distributed.The Scale Location is fairly horizontal however towards the right end it appears to curve upwards. This suggests the variance may be slightly uneven. The Residuals vs Leverage plot depicts data points that require further investigation as they have a high leverage and are far from x=0. 
+
+Taking a further look at influential points using leverage and Cook’s distance, I use the equations 
+Leverage cutoff = (2(p+1))/ n and cook's cutoff  2 * (p + 1) / (n - p - 1) to find influential points. Using these equations as well as the linear model we can find the points above the cutoffs. The data points that are above the cook's cutoff is data point 20, the city being York. The data points above the leverage cutoff is data points 3,7,8,19 and 20. Their cities are San Diego, Miami, Los Angeles,San Francisco and York.
 
     *Answer text here*
 
     ```{r}
-    # Answer code here
 poll_data <- read.csv("Pollution.csv")
 cp_model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = poll_data)
-    
-plot(cp_model, which = 5, cook.levels = 4 / (nrow(poll_data) - 2))
 
-cooks_distance <- cooks.distance(cp_model)
-sort(cooks_distance, decreasing = TRUE)[1:5]
+# Model dimensions
+p <- length(coef(cp_model)) - 1
+n <- nrow(poll_data)
+
+#Diagnostics Plot
+par(mfrow = c(2, 2))
+plot(cp_model)
+
+#The influential points are those with Cook's distance 
+par(mfrow = c(1, 1))
+cook_cutoff <- 2 * (p + 1) / (n - p - 1)
+plot(cp_model, which = 5, cook.levels = cook_cutoff)
+
+#Find Influential Points using Cook's Distance
+cooks_d <- cooks.distance(cp_model)
+cook_cutoff_points <- which(cooks_d > cook_cutoff)
+print(cook_cutoff_points)
+
+#Find high leverage
+lev_cutoff <- 2 * (p + 1) / n
+high_leverage <- which(hatvalues(cp_model) > lev_cutoff)
+print (high_leverage)
+
+#Find the Cities
+print(poll_data[cook_cutoff_points, "City"])
+print(poll_data[high_leverage, "City"])
+
 
     ```
-
+    
+    
 (e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extrasum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
 
     **Answer:**
-Expand on later but Small p value means reject null hypotosies blah blah blah
+First I created the expanded model by adding the log-transformed variables of HC, NOX and SO2 into the base model.I used the extrasum-of-squares F-test on both the base and expanded linear models, giving me the p-value of 0.008313. This p-value is small, being less than 0.05. This means that the expanded model is statistically significant. This suggests the addition of the logarithm of the three pollution variables improved the model's ability to predict mortality rates. Therefore, we reject the null hypothosies. 
 
-    *Answer text here*
 
     ```{r}
     # Answer code here
